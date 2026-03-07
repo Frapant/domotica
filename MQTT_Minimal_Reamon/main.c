@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "pico/stdlib.h"
+#include "hardware/i2c.h"
 #include "MQTT.h"
 
 #define MQTT_TOPIC_PUB  "Makerspace/Logger01"

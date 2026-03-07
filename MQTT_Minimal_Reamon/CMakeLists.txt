@@ -55,6 +55,7 @@ target_link_libraries(ATlib
         hardware_uart
         hardware_gpio
         hardware_irq
+        hardware_i2c
 )
 
 target_include_directories(ATlib PRIVATE

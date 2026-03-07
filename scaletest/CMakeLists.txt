@@ -23,7 +23,7 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-set(PICO_BOARD pico2 CACHE STRING "Board type")
+set(PICO_BOARD ilabs_challenger_rp2350_wifi_ble CACHE STRING "Board type")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
@@ -35,7 +35,9 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(scaletest scaletest.c )
+add_executable(scaletest main.c 
+                        scale.c
+                        motor.c)
 
 pico_set_program_name(scaletest "scaletest")
 pico_set_program_version(scaletest "0.1")
@@ -46,17 +48,15 @@ pico_enable_stdio_usb(scaletest 1)
 
 # Add the standard library to the build
 target_link_libraries(scaletest
-        pico_stdlib)
+        pico_stdlib
+        hardware_i2c
+        hardware_gpio
+        )
 
 # Add the standard include files to the build
 target_include_directories(scaletest PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
-
-# Add any user requested libraries
-target_link_libraries(scaletest 
-        hardware_i2c
-        )
-
+        
 pico_add_extra_outputs(scaletest)
 
