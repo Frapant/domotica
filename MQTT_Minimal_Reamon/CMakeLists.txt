@@ -39,7 +39,9 @@ add_executable(ATlib main.c
                     esp_at.c 
                     esp_mqtt.c 
                     esp_wifi.c
-                    MQTT.c)
+                    MQTT.c
+                    scale.c
+                    motor.c)
                     
 
 pico_set_program_name(ATlib "ATlib")
