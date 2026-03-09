@@ -16,11 +16,11 @@
 
 #define MQTT_BROKER_IP  "10.42.0.1"
 #define MQTT_POORT      1883
-#define MQTT_CLIENT_ID  "Datalogger01"
+#define MQTT_CLIENT_ID  "tap"
 #define MQTT_SCHEME     1   // 1 = MQTT over TCP (geen TLS)
 
-#define MQTT_TOPIC_SUB  "Makerspace/Logger01"
-#define MQTT_TOPIC_PUB  "Makerspace/Logger01"
+#define MQTT_TOPIC_SUB  "tap/actr"
+#define MQTT_TOPIC_PUB  "tap/snsr"
 
 #define PUB_INTERVAL_MS 5000
 
@@ -141,6 +141,8 @@ bool mqtt_init(){
 
     esp_mqtt_subscribe(MQTT_TOPIC_SUB,0,8000);
 
+    //esp_mqtt_subscribe("Makerspace/Motors",0,8000);
+
     DEBUG_PRINT("\r\n[INFO] MQTT status: AT+MQTTCONN?\r\n");
     esp_at_write("AT+MQTTCONN?\r\n");
     drain_uart(2000);
@@ -155,23 +157,25 @@ bool mqtt_init(){
 // =============================
 
 bool mqtt_send(char data[], char topic[]){
-    if(mqtt_pubraw(topic, data)== true)
-    {
-        DEBUG_PRINT("[INFO] MQTT PUBRAW verzonden: %s\r\n", data);
+    bool status = esp_mqtt_publiceer(topic,data,1,true,15000);
+    
+    printf("STATUS: %d\n",status);
+
+    if (status==0){
+        DEBUG_PRINT("[INFO] MQTT PUB verzonden: %s\r\n", data);
         MQTT_send_message(topic, data);
         return true;
     }
-    else
-    {
+    else {
         printf("[FOUT] MQTT PUBRAW mislukt\r\n");
         return false;
     }
-
 }
 
 // =============================
 // Subscriben
 // =============================
+
 
 // =============================
 // Syc

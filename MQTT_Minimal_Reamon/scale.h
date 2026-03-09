@@ -5,4 +5,5 @@ void weigh_loop();
 
 extern float nulpunt;
 extern float gewicht;
+extern bool state_scale;
 #endif /* _SCALE_H_ */

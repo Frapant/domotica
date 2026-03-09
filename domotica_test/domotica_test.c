@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 
-//in1 = 10, in2 = 9 voor motor controller
+//in2 = 10, in1 = 9 voor motor controller
 #define IN1 2 
 #define IN2 25 
 

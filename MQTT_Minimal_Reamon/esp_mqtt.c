@@ -144,6 +144,32 @@ esp_err_t esp_mqtt_disconnect(uint32_t timeout_ms)
 }
 
 // =============================
+// MQTT publish via PUB
+// =============================
+esp_err_t esp_mqtt_publiceer(const char *topic,
+                              const char *payload,
+                              int qos,
+                              bool retain,
+                              uint32_t timeout_ms)
+{
+    if (!topic || !payload) return ESP_ERR_BAD_PARAM;
+
+    if (qos < 0) qos = 0;
+    if (qos > 2) qos = 2;
+
+    int r = retain ? 1 : 0;
+
+    // Let op: payload met quotes kan issues geven met AT strings.
+    char cmd[256];
+
+    snprintf(cmd, sizeof(cmd), "AT+MQTTPUB=0,\"%s\",\"%s\",%d,%d\r\n",
+             topic, payload, qos, r);
+
+    return esp_at_cmd(cmd, "OK", timeout_ms);
+}
+
+
+// =============================
 // MQTT publish via PUBRAW
 // =============================
 bool mqtt_pubraw(const char *topic, const char *payload)

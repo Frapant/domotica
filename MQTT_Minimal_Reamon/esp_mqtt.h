@@ -89,6 +89,12 @@ esp_err_t esp_mqtt_unsubscribe(
 // Publiceer bericht
 // ============================================================
 
+esp_err_t esp_mqtt_publiceer(const char *topic,
+                              const char *payload,
+                              int qos,
+                              bool retain,
+                              uint32_t timeout_ms);
+
 bool mqtt_pubraw(const char *topic, const char *payload);
 
 

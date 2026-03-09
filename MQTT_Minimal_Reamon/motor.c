@@ -5,6 +5,8 @@
 #define IN1 25 // fysiek 9
 #define IN2 2 // fysiek 10
 
+bool state_tap = 0;
+
 void init() {
     // H-brug kanalen
     gpio_init(IN1);
@@ -20,13 +22,15 @@ void init() {
 void open() {
     init();
     gpio_put(IN1, 1);
-    sleep_ms(20);
+    sleep_ms(200);
     gpio_put(IN1, 0);
+    state_tap = 1;
 }
 
 void dicht() {
     init();
     gpio_put(IN2, 1);
-    sleep_ms(20);
+    sleep_ms(200);
     gpio_put(IN2, 0);
+    state_tap = 0;
 }
