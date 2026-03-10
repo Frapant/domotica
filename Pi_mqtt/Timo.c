@@ -5,16 +5,21 @@
 
 #include "MQTT.h"
 #include "Timo.h"
+#include "sql.h"
 
-float gewicht;
+double gewicht;
 
-void Message_Recieved(const char *topic, const char *payload){
+void Message_Recieved_T(const char *topic, const char *payload){
     printf("\n[ONTVANGEN] Topic: %s | Bericht: %s\n", topic, payload);
+    printf("%.2f\n", gewicht)
 
-    // receive message op topic
+    // receive message op topic en verwerking onderneemt actie indien nodig
     if (strcmp(topic, "tap/snsr") == 0) {
         printf("Ontvangen payload: %s\n", payload);
-        memccpy(&gewicht, payload, sizeof(payload));
+        // zet ontvangen gewicht om van string naar double, voor voorwaarden
+        gewicht = atof(payload);
+        // logt het gewicht bij elke payload ontvangst
+        insert_meting(gewicht);
         if (gewicht > 30 && gewicht < 200){
             MQTT_publish("tap/actr","open",0); //publish
         }
@@ -30,6 +35,8 @@ void Timo_loop(){
 }
 
 bool Timo_Init(){
+    // connect naar de database 1 maal bij opstarten
+    db_connect();
 
     //Subscriben naar topics die je wilt ontvangen
     //LET OP!!!
