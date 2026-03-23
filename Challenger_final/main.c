@@ -11,9 +11,7 @@
 
 #define MQTT_TOPIC_PUB  "tap/snsr"
 
-int PUB_INTERVAL_MS = 1000;
-
-#define BTN 7
+#define PUB_INTERVAL_MS 50
 
 // actuator commando ontvangen
 void Use_data(const char *topic, const char *payload){
@@ -21,16 +19,15 @@ void Use_data(const char *topic, const char *payload){
         printf("Ontvangen payload: %s\n", payload);
 
         if (strcmp(payload, "open") == 0) {
-            PUB_INTERVAL_MS = 10;
+            //PUB_INTERVAL_MS = 10;
             open();
         }
         else if (strcmp(payload, "dicht") == 0) {
             dicht();
-            PUB_INTERVAL_MS = 1000;
+            //PUB_INTERVAL_MS = 1000;
         }
     }
 }
-
 
 int main()
 {
@@ -40,13 +37,8 @@ int main()
     mqtt_init();
     weigh_init();
 
-    gpio_init(BTN);
-    gpio_set_dir(BTN, GPIO_IN);
-    gpio_pull_up(BTN);
-    
-    bool btn = 0;
-
-    int teller = 0;
+    // solenoid valve dicht voor safety
+    dicht();
     absolute_time_t volgende = make_timeout_time_ms(PUB_INTERVAL_MS);
 
     while (1)

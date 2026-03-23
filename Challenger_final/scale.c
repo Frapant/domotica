@@ -18,7 +18,6 @@ uint8_t buffer[4]; // buffer van de data
 // globale variabelen voor gewicht en nulpunt en staat
 float nulpunt;
 float gewicht;
-bool state_scale = 0;
 
 void weigh_init()
 {
@@ -50,11 +49,4 @@ void weigh_loop()
 
         // copy naar andere variable voor verwerking
         memcpy(&gewicht, buffer, 4);
-
-        // "ik ben leeg"
-        if (gewicht < nulpunt + 10) {
-            state_scale = 0;
-        } else {
-            state_scale = 1;
-        }
 }
