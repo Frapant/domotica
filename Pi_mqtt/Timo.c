@@ -6,7 +6,7 @@
 
 #include "MQTT.h"
 #include "Timo.h"
-#include "sql.h"
+#include "sql_t.h"
 
 // voor het toevoegen aan database
 char *type = "gewicht";
@@ -16,7 +16,7 @@ double gewicht = 0;         // live gewogen gewicht
 double leeg_gewicht = 0;    // nul gewicht
 double prev_gewicht = 0;    // live gewicht - 1 voor checken of t constant is
 double start_gewicht = 0;   // begin gewicht zodra die opengaat
-double log_gewicht = 0;     // gewicht dat naar de db wordt gezet aka verschil in start/live aka hoeveel ml er in t glas is gekomen
+double log_gewicht = 0;     // gewicht dat naar de db wordt gezet oftewel verschil in start/live oftewel hoeveel ml er in t glas is gekomen
 
 // bool states voor controle of kraan open of dicht is
 bool kan_open = true;       // MAG de kraan open aka, staat er niks op?
@@ -30,14 +30,14 @@ int i = 0;
 void Message_Recieved_T(const char *topic, const char *payload){
 
     // als ontvangen topic dit is dan doe alles
-    if (strcmp(topic, "tap/snsr") == 0) {   
+    if (strcmp(topic, "tap/snsr") == 0) {
         // convert  payload naar double voor voorwaarden (ontvangt alleen maar gewicht in juiste vorm)
         gewicht = atof(payload);
 
         // checkt of het het eerste ontvangen bericht is voor nulpunt
         if (first == true) {
             leeg_gewicht = gewicht;
-            first = false;   
+            first = false;
         }
 
         // kan kijken hiermee kijken of gewicht stabiel is
@@ -57,31 +57,37 @@ void Message_Recieved_T(const char *topic, const char *payload){
             }
         }
 
-        // zodra huidig gewicht groter is dan start gewicht + 100gram ga dicht en log en reset de waarden   
-        if (gewicht > start_gewicht + 100 && is_open == true){
+        // zodra huidig gewicht groter is dan start gewicht + 200gram ga dicht en log en reset de waarden
+        if (gewicht > start_gewicht + 200 && is_open == true){
             MQTT_publish("tap/actr","dicht",0);
+
+            // log gewicht naar db, hoort altijd rond 200 te zijn
             log_gewicht = gewicht - start_gewicht;
             insert_meting(log_gewicht, type);
             is_open = false;
             start_gewicht = 0;
             i = 0;
         }
-        
-        // als open en gewicht komt onder start waarde aka glas weg, ga dicht
-        if (is_open == true && gewicht < start_gewicht) {
+
+        // als open is en gewicht komt onder start waarde aka glas weg, ga dicht, -2 is afwijking compensatie
+        if (is_open == true && gewicht < start_gewicht - 2) {
             MQTT_publish("tap/actr","dicht",0);
+            
+            // logt ook, geeft negatieve waarde, indiceert vroegtijdige sluiting
+            log_gewicht = gewicht - start_gewicht;
+            insert_meting(log_gewicht, type);
             is_open = false;
             start_gewicht = 0;
             i = 0;
         }
 
-        // zorgt dat alleen open kan als de weegschaal leeg is
+        // zorg dat alleen open kan als de weegschaal leeg is
         if (gewicht < leeg_gewicht + 10) {
             kan_open =  true;
         }
 
         // debug string
-        //printf("gewicht:%.2f || leeg:%.2f || start:%.2f || prev:%.2f\n", gewicht, leeg_gewicht, start_gewicht, prev_gewicht);
+        // printf("gewicht:%.2f || leeg:%.2f || start:%.2f || prev:%.2f\n", gewicht, leeg_gewicht, start_gewicht, prev_gewicht);
     }
 }
 

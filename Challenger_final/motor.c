@@ -20,13 +20,13 @@ void init() {
 void open() {
     init();
     gpio_put(IN1, 1);
-    sleep_ms(20);
+    sleep_ms(100);
     gpio_put(IN1, 0);
 }
 
 void dicht() {
     init();
     gpio_put(IN2, 1);
-    sleep_ms(20);
+    sleep_ms(100);
     gpio_put(IN2, 0);
 }
